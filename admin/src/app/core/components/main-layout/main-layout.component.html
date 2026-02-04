@@ -1,0 +1,43 @@
+<div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="bg-dark border-end" id="sidebar-wrapper">
+        <div class="sidebar-heading text-white bg-dark border-bottom">Admin Panel</div>
+        <div class="list-group list-group-flush">
+            <a routerLink="/catalog" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-box-seam me-2"></i>Catálogo</a>
+            <a routerLink="/inventory" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-building me-2"></i>Inventario</a>
+            <a routerLink="/orders" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-cart me-2"></i>Pedidos</a>
+            <a routerLink="/customers" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-people me-2"></i>Clientes</a>
+            <a routerLink="/reports" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-graph-up me-2"></i>Reportes</a>
+            <a routerLink="/support" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-headset me-2"></i>Soporte</a>
+            <a routerLink="/content" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-file-text me-2"></i>Contenido</a>
+            <a routerLink="/users" routerLinkActive="active" class="list-group-item list-group-item-action list-group-item-dark p-3"><i class="bi bi-person-badge me-2"></i>Usuarios</a>
+        </div>
+    </div>
+    <!-- Page Content -->
+    <div id="page-content-wrapper" class="w-100">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+            <div class="container-fluid">
+                <span class="navbar-brand">Limarpoo Admin</span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                        <li class="nav-item active"><a class="nav-link" href="#">Inicio</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">Admin</a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Perfil</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Cerrar Sesión</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container-fluid p-4">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3">Usuarios del Sistema</h2>
+        <div>
+            <button class="btn btn-outline-secondary me-2">Gestionar Roles</button>
+            <button class="btn btn-primary">
+                <i class="bi bi-person-plus me-2"></i>Invitar Usuario
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let user of users">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2"
+                                        style="width: 32px; height: 32px;">
+                                        {{ user.name.charAt(0) }}
+                                    </div>
+                                    <div class="fw-bold">{{ user.name }}</div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ user.role }}</span></td>
+                            <td>
+                                <span class="badge rounded-pill"
+                                    [ngClass]="user.status === 'Active' ? 'bg-success' : 'bg-secondary'">
+                                    {{ user.status === 'Active' ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary me-2">Editar</button>
+                                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

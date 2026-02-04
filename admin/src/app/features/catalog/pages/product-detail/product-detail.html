@@ -1,0 +1,79 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3">{{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+        <button type="button" class="btn btn-outline-secondary" routerLink="/catalog">
+            <i class="bi bi-arrow-left me-2"></i>Volver
+        </button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label for="name" class="form-label">Nombre del Producto</label>
+                        <input type="text" class="form-control" id="name" formControlName="name"
+                            [class.is-invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched">
+                        <div class="invalid-feedback">El nombre es requerido</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="sku" class="form-label">SKU</label>
+                        <input type="text" class="form-control" id="sku" formControlName="sku"
+                            [class.is-invalid]="productForm.get('sku')?.invalid && productForm.get('sku')?.touched">
+                        <div class="invalid-feedback">El SKU es requerido</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="category" class="form-label">Categoría</label>
+                        <select class="form-select" id="category" formControlName="category">
+                            <option value="">Seleccione...</option>
+                            <option value="Ropa">Ropa</option>
+                            <option value="Calzado">Calzado</option>
+                            <option value="Electrónica">Electrónica</option>
+                            <option value="Joyería">Joyería</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="price" class="form-label">Precio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">S/</span>
+                            <input type="number" class="form-control" id="price" formControlName="price">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="stock" class="form-label">Stock</label>
+                        <input type="number" class="form-control" id="stock" formControlName="stock">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label d-block">Estado</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="active" value="Active"
+                                formControlName="status">
+                            <label class="form-check-label" for="active">Activo</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inactive" value="Inactive"
+                                formControlName="status">
+                            <label class="form-check-label" for="inactive">Inactivo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-light me-2" routerLink="/catalog">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || loading">
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"
+                            aria-hidden="true"></span>
+                        {{ isEditMode ? 'Guardar Cambios' : 'Crear Producto' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

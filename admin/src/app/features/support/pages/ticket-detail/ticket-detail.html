@@ -1,0 +1,99 @@
+<div class="container-fluid" *ngIf="ticket$ | async as ticket; else loading">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0">Ticket #{{ ticket.id }}</h2>
+            <span class="text-muted">{{ ticket.subject }}</span>
+        </div>
+        <button class="btn btn-outline-secondary" routerLink="/support">
+            <i class="bi bi-arrow-left me-2"></i>Volver
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-3"
+                                style="width: 40px; height: 40px;">
+                                <i class="bi bi-person text-secondary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">{{ ticket.customer }}</h6>
+                            <small class="text-muted">Cliente - Hace 2 horas</small>
+                            <div class="bg-light p-3 rounded mt-2">
+                                <p class="mb-0">Hola, tengo un problema con mi último pedido. No he recibido el número
+                                    de seguimiento.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-3"
+                                style="width: 40px; height: 40px;">
+                                A
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Agente de Soporte</h6>
+                            <small class="text-muted">Admin - Hace 1 hora</small>
+                            <div class="bg-primary-subtle p-3 rounded mt-2">
+                                <p class="mb-0">Hola {{ ticket.customer }}, lamentamos el inconveniente. Estamos
+                                    verificando con el transportista ahora mismo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="3" placeholder="Escribe una respuesta..."></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button class="btn btn-primary">Responder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">Detalles del Ticket</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="small text-muted text-uppercase fw-bold">Estado</label>
+                        <select class="form-select form-select-sm mt-1">
+                            <option [selected]="ticket.status === 'Open'">Abierto</option>
+                            <option [selected]="ticket.status === 'In Progress'">En Progreso</option>
+                            <option [selected]="ticket.status === 'Closed'">Cerrado</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-muted text-uppercase fw-bold">Prioridad</label>
+                        <select class="form-select form-select-sm mt-1">
+                            <option [selected]="ticket.priority === 'High'">Alta</option>
+                            <option [selected]="ticket.priority === 'Medium'">Media</option>
+                            <option [selected]="ticket.priority === 'Low'">Baja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="small text-muted text-uppercase fw-bold">Cliente</label>
+                        <div class="fw-bold mt-1">{{ ticket.customer }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #loading>
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,58 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="h3">Ubicaciones de Almacén</h2>
+            <button class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Nueva Ubicación
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let warehouse of warehouses$ | async">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ warehouse.name }}</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Editar</a></li>
+                                <li><a class="dropdown-item" href="#">Ver Inventario</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-danger" href="#">Desactivar</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-3">
+                        <i class="bi bi-geo-alt me-1"></i> {{ warehouse.location }}
+                    </p>
+                    <div class="mb-3">
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem;">Capacidad</small>
+                        <div class="progress mt-1" style="height: 6px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 65%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">Ocupado: 65%</small>
+                            <small class="text-muted">Total: {{ warehouse.capacity | number }} un.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem;">Responsable</small>
+                        <div class="d-flex align-items-center mt-1">
+                            <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2"
+                                style="width: 24px; height: 24px; font-size: 0.75rem;">
+                                {{ warehouse.manager.charAt(0) }}
+                            </div>
+                            <span>{{ warehouse.manager }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

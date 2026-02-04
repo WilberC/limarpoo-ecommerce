@@ -1,0 +1,46 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3">Reportes Financieros</h2>
+        <button class="btn btn-outline-primary">
+            <i class="bi bi-download me-2"></i>Descargar PDF
+        </button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Transacciones</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Impuestos</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID Transacción</th>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th class="text-end">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let trx of transactions">
+                            <td>{{ trx.id }}</td>
+                            <td>{{ trx.date | date:'dd/MM/yyyy' }}</td>
+                            <td>{{ trx.description }}</td>
+                            <td class="text-end fw-bold"
+                                [ngClass]="trx.type === 'Credit' ? 'text-success' : 'text-danger'">
+                                {{ trx.type === 'Credit' ? '+' : '' }}{{ trx.amount | currency:'EUR' }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

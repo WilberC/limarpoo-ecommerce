@@ -1,0 +1,47 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3">Gestión de Contenido</h2>
+        <button class="btn btn-primary" routerLink="new">
+            <i class="bi bi-plus-lg me-2"></i>Nuevo Contenido
+        </button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Modificado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let content of contents">
+                            <td class="fw-bold">{{ content.title }}</td>
+                            <td><span class="badge bg-secondary">{{ content.type }}</span></td>
+                            <td>
+                                <span class="badge rounded-pill"
+                                    [ngClass]="content.status === 'Published' ? 'bg-success' : 'bg-warning text-dark'">
+                                    {{ content.status === 'Published' ? 'Publicado' : 'Borrador' }}
+                                </span>
+                            </td>
+                            <td>{{ content.lastModified | date:'dd/MM/yyyy' }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
