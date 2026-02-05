@@ -6,13 +6,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
 
+  console.log('Auth Interceptor - Token:', token ? 'Present' : 'Missing');
+
   if (token) {
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log('Auth Interceptor - Added Authorization header');
   }
 
-  return next(req);
+  const response = next(req);
+  console.log('Auth Interceptor - Request sent, returning response stream');
+  return response;
 };

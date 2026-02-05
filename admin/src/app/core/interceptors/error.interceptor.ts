@@ -10,8 +10,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  console.log('Error Interceptor - Passing request:', req.url);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      console.error('Error Interceptor - Caught error:', error.status, error.message);
       if (error.status === 401) {
         // Unauthorized - clear session and redirect to login
         authService.logout();
