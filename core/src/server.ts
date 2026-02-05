@@ -23,6 +23,13 @@ app.use(express.json());
 // Swagger Documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Routes
+import authRoutes from "./routes/auth.routes";
+import v1Routes from "./routes/index";
+
+app.use("/auth", authRoutes);
+app.use("/api/v1", v1Routes);
+
 /**
  * @swagger
  * /health:
