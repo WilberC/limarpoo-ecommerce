@@ -35,7 +35,22 @@ export class ProductController {
       if (error.code === "P2002") {
         // Unique constraint violation (SKU)
         res.status(409).json({ error: "Product with this SKU already exists" });
+      } else if (error.code === "P2003") {
+        // Foreign key constraint violation (Category ID)
+        res.status(400).json({
+          error:
+            "Invalid category_id or other foreign key constraint violation",
+        });
+      } else if (error.name === "PrismaClientValidationError") {
+        // Validation error (missing fields, invalid types)
+        res
+          .status(400)
+          .json({
+            error:
+              "Invalid input data: " + error.message.split("\n").pop()?.trim(),
+          });
       } else {
+        console.error("Error creating product:", error);
         res.status(500).json({ error: "Internal server error" });
       }
     }

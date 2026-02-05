@@ -1,34 +1,86 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3">Editar Contenido</h2>
-        <button class="btn btn-outline-secondary" routerLink="/content">
+        <h2 class="h3">{{ isEditMode ? 'Editar' : 'Crear' }} Artículo</h2>
+        <button class="btn btn-outline-secondary" (click)="cancel()" [disabled]="loading || saving">
             <i class="bi bi-arrow-left me-2"></i>Volver
         </button>
     </div>
 
-    <div class="card shadow-sm">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted">Cargando artículo...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
+        <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadArticle(articleId!)">
+            <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+        </button>
+    </div>
+
+    <!-- Form State -->
+    <div *ngIf="!loading && !error" class="card shadow-sm">
         <div class="card-body">
-            <form>
+            <form [formGroup]="articleForm" (ngSubmit)="onSubmit()">
                 <div class="mb-3">
-                    <label class="form-label">Título</label>
-                    <input type="text" class="form-control" value="Banner Principal Verano">
+                    <label for="title" class="form-label">Título *</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="title"
+                        formControlName="title"
+                        placeholder="Ingresa el título del artículo"
+                        [disabled]="saving"
+                        [class.is-invalid]="articleForm.get('title')?.invalid && articleForm.get('title')?.touched">
+                    <div class="invalid-feedback" *ngIf="articleForm.get('title')?.invalid && articleForm.get('title')?.touched">
+                        <span *ngIf="articleForm.get('title')?.errors?.['required']">El título es requerido</span>
+                        <span *ngIf="articleForm.get('title')?.errors?.['minlength']">El título debe tener al menos 3 caracteres</span>
+                    </div>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">Tipo</label>
-                    <select class="form-select">
-                        <option>Banner</option>
-                        <option>Página</option>
-                        <option>Post</option>
-                    </select>
+                    <label for="content" class="form-label">Contenido *</label>
+                    <textarea
+                        class="form-control font-monospace"
+                        id="content"
+                        formControlName="content"
+                        rows="12"
+                        placeholder="Ingresa el contenido del artículo (HTML soportado)"
+                        [disabled]="saving"
+                        [class.is-invalid]="articleForm.get('content')?.invalid && articleForm.get('content')?.touched"></textarea>
+                    <div class="invalid-feedback d-block" *ngIf="articleForm.get('content')?.invalid && articleForm.get('content')?.touched">
+                        <span *ngIf="articleForm.get('content')?.errors?.['required']">El contenido es requerido</span>
+                        <span *ngIf="articleForm.get('content')?.errors?.['minlength']">El contenido debe tener al menos 10 caracteres</span>
+                    </div>
+                    <small class="text-muted">Puedes usar HTML básico para formatear el contenido</small>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Contenido HTML</label>
-                    <textarea class="form-control font-monospace"
-                        rows="10"><h1>Bienvenido al Verano</h1><p>Descubre nuestra nueva colección.</p></textarea>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-light me-2">Guardar Borrador</button>
-                    <button type="submit" class="btn btn-primary">Publicar</button>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        (click)="cancel()"
+                        [disabled]="saving">
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        [disabled]="articleForm.invalid || saving">
+                        <span *ngIf="!saving">
+                            {{ isEditMode ? 'Actualizar' : 'Crear' }} Artículo
+                        </span>
+                        <span *ngIf="saving">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Guardando...
+                        </span>
+                    </button>
                 </div>
             </form>
         </div>

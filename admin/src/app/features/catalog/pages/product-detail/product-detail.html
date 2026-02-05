@@ -17,6 +17,13 @@
                         <div class="invalid-feedback">El nombre es requerido</div>
                     </div>
 
+                    <div class="col-12">
+                        <label for="description" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="description" rows="3" formControlName="description"
+                            [class.is-invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched"></textarea>
+                        <div class="invalid-feedback">La descripción es requerida</div>
+                    </div>
+
                     <div class="col-md-4">
                         <label for="sku" class="form-label">SKU</label>
                         <input type="text" class="form-control" id="sku" formControlName="sku"
@@ -25,10 +32,13 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="category" class="form-label">Categoría (ID)</label>
-                        <input type="text" class="form-control" id="category" formControlName="category_id"
-                            placeholder="e.g. cat_123">
-                        <!-- Select removed as we need IDs for now, or dynamic loading of categories -->
+                        <label for="category" class="form-label">Categoría</label>
+                        <select class="form-select" id="category" formControlName="category_id">
+                            <option value="" disabled>Seleccione una categoría</option>
+                            <option *ngFor="let cat of categories" [value]="cat.id">
+                                {{ cat.name }}
+                            </option>
+                        </select>
                     </div>
 
                     <div class="col-md-4">

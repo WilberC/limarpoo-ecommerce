@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
 import { UserService } from '../../../../core/services/user.service';
 import { User } from '../../../../core/models/user.model';
 
@@ -12,11 +11,29 @@ import { User } from '../../../../core/models/user.model';
   styleUrl: './user-list.scss',
 })
 export class UserListComponent implements OnInit {
-  users$!: Observable<User[]>;
+  users: User[] = [];
+  loading = false;
+  error: string | null = null;
 
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.users$ = this.userService.getUsers();
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load users';
+        this.loading = false;
+      },
+    });
   }
 }

@@ -2,16 +2,40 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3">Pedidos</h2>
         <div class="input-group w-25">
-            <input type="text" class="form-control" placeholder="Buscar pedido o cliente...">
-            <button class="btn btn-outline-secondary" type="button">
+            <input type="text" class="form-control" placeholder="Buscar pedido o cliente..." [disabled]="loading">
+            <button class="btn btn-outline-secondary" type="button" [disabled]="loading">
                 <i class="bi bi-search"></i>
             </button>
         </div>
     </div>
 
-    <div class="card shadow-sm">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted">Cargando pedidos...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
+        <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadOrders()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+        </button>
+    </div>
+
+    <!-- Content State -->
+    <div *ngIf="!loading && !error" class="card shadow-sm">
         <div class="card-body">
-            <div class="table-responsive">
+            <div *ngIf="orders.length === 0" class="text-center py-5 text-muted">
+                <i class="bi bi-bag-check display-1"></i>
+                <p class="mt-3">No hay pedidos encontrados.</p>
+            </div>
+
+            <div *ngIf="orders.length > 0" class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
@@ -25,11 +49,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let order of orders$ | async">
+                        <tr *ngFor="let order of orders">
                             <td>
                                 <span class="fw-bold text-primary">{{ order.id }}</span>
                             </td>
-                            <td>{{ order.user_id }}</td>
+                            <td>{{ order.user?.email || order.user_id }}</td>
                             <td>{{ order.created_at | date:'dd/MM/yyyy' }}</td>
                             <td>{{ order.total_amount | currency:'PEN' }}</td>
                             <td>
@@ -46,8 +70,8 @@
                             </td>
                             <td>
                                 <span class="badge rounded-pill"
-                                    [ngClass]="order.status === 'PAID' ? 'bg-success' : 'bg-secondary'">
-                                    {{ order.status === 'PAID' ? 'Pagado' : 'Pendiente' }}
+                                    [ngClass]="order.payment?.status === 'PAID' ? 'bg-success' : 'bg-secondary'">
+                                    {{ order.payment?.status === 'PAID' ? 'Pagado' : 'Pendiente' }}
                                 </span>
                             </td>
                             <td class="text-end">

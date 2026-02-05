@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../../../core/services/order.service';
 import { UserService } from '../../../../core/services/user.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -16,13 +17,25 @@ export class SalesAnalyticsComponent implements OnInit {
   totalOrders = 0;
   totalCustomers = 0;
   averageOrderValue = 0;
+  pendingOrders = 0;
+
+  loading = false;
+  error: string | null = null;
 
   constructor(
     private orderService: OrderService,
     private userService: UserService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
+    this.loadAnalytics();
+  }
+
+  loadAnalytics(): void {
+    this.loading = true;
+    this.error = null;
+
     forkJoin({
       orders: this.orderService.getOrders(),
       users: this.userService.getUsers(),
@@ -30,11 +43,15 @@ export class SalesAnalyticsComponent implements OnInit {
       next: ({ orders, users }) => {
         this.totalOrders = orders.length;
         this.totalCustomers = users.length;
-        // Order total_amount is likely number.
         this.totalRevenue = orders.reduce((acc, order) => acc + Number(order.total_amount), 0);
         this.averageOrderValue = this.totalOrders > 0 ? this.totalRevenue / this.totalOrders : 0;
+        this.pendingOrders = orders.filter((o) => o.status === 'PENDING').length;
+        this.loading = false;
       },
-      error: (err) => console.error('Error loading analytics', err),
+      error: (err) => {
+        this.error = 'Failed to load analytics';
+        this.loading = false;
+      },
     });
   }
 }

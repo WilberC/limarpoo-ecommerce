@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { UserService } from '../../../../core/services/user.service';
 import { Customer } from '../../../../core/models/customer.model';
 
@@ -14,21 +12,35 @@ import { Customer } from '../../../../core/models/customer.model';
   styleUrl: './customer-list.scss',
 })
 export class CustomerListComponent implements OnInit {
-  customers$!: Observable<Customer[]>;
+  customers: Customer[] = [];
+  loading = false;
+  error: string | null = null;
 
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.customers$ = this.userService.getUsers().pipe(
-      map((users) =>
-        users.map((user) => ({
+    this.loadCustomers();
+  }
+
+  loadCustomers(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.customers = users.map((user) => ({
           ...user,
-          name: `${user.firstName} ${user.lastName}`,
-          phone: 'N/A', // Default as not in User model
-          totalOrders: 0, // Default for now
-          joinDate: new Date(), // Default for now
-        })),
-      ),
-    );
+          name: user.email,
+          phone: 'N/A',
+          totalOrders: 0,
+          joinDate: new Date(),
+        }));
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load customers';
+        this.loading = false;
+      },
+    });
   }
 }

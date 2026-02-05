@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
+import { CategoryService } from '../../../../core/services/category.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { Category } from '../../../../core/models/category.model';
 
 @Component({
   selector: 'app-product-detail',
@@ -16,30 +19,44 @@ export class ProductDetailComponent implements OnInit {
   isEditMode = false;
   productId: string | null = null;
   loading = false;
+  categories: Category[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
+    private categoryService: CategoryService,
+    private toastService: ToastService,
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       sku: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
       stock_quantity: [0, [Validators.required, Validators.min(0)]],
+      description: ['', Validators.required],
       category_id: ['', Validators.required],
       // status: ['Active', Validators.required], // Status removed as per model
     });
   }
 
   ngOnInit(): void {
+    this.loadCategories();
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
       this.isEditMode = true;
       this.productId = id;
       this.loadProduct(this.productId);
     }
+  }
+
+  loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => (this.categories = categories),
+      error: () => {
+        this.toastService.error('Failed to load categories');
+      },
+    });
   }
 
   loadProduct(id: string): void {
@@ -69,17 +86,25 @@ export class ProductDetailComponent implements OnInit {
         this.productService.updateProduct(this.productId, productData).subscribe({
           next: () => {
             this.loading = false;
+            this.toastService.success('Product updated successfully');
             this.router.navigate(['/catalog']);
           },
-          error: () => (this.loading = false),
+          error: (err) => {
+            this.loading = false;
+            // Error toast handled by error interceptor
+          },
         });
       } else {
         this.productService.createProduct(productData).subscribe({
           next: () => {
             this.loading = false;
+            this.toastService.success('Product created successfully');
             this.router.navigate(['/catalog']);
           },
-          error: () => (this.loading = false),
+          error: (err) => {
+            this.loading = false;
+            // Error toast handled by error interceptor
+          },
         });
       }
     }

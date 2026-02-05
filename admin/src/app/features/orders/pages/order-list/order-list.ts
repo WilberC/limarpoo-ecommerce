@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
 import { OrderService } from '../../../../core/services/order.service';
 import { Order } from '../../../../core/models/order.model';
 
@@ -13,11 +12,29 @@ import { Order } from '../../../../core/models/order.model';
   styleUrl: './order-list.scss',
 })
 export class OrderListComponent implements OnInit {
-  orders$!: Observable<Order[]>;
+  orders: Order[] = [];
+  loading = false;
+  error: string | null = null;
 
   constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
-    this.orders$ = this.orderService.getOrders();
+    this.loadOrders();
+  }
+
+  loadOrders(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.orderService.getOrders().subscribe({
+      next: (orders) => {
+        this.orders = orders;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load orders';
+        this.loading = false;
+      },
+    });
   }
 }

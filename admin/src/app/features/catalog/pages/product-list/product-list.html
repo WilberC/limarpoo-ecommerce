@@ -1,18 +1,43 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3">Catálogo de Productos</h2>
-        <a routerLink="new" class="btn btn-primary">
+        <a routerLink="new" class="btn btn-primary" [class.disabled]="loading">
             <i class="bi bi-plus-lg me-2"></i>Nuevo Producto
         </a>
     </div>
 
-    <div class="card shadow-sm">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted">Cargando productos...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
+        <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadProducts()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+        </button>
+    </div>
+
+    <!-- Content State -->
+    <div *ngIf="!loading && !error" class="card shadow-sm">
         <div class="card-body">
-            <div class="table-responsive">
+            <div *ngIf="products.length === 0" class="text-center py-5 text-muted">
+                <i class="bi bi-box-seam display-1"></i>
+                <p class="mt-3">No hay productos encontrados.</p>
+            </div>
+
+            <div *ngIf="products.length > 0" class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
+                            <th>#</th>
+                            <th>Identifier</th>
                             <th>Producto</th>
                             <th>SKU</th>
                             <th>Categoría</th>
@@ -23,8 +48,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let product of products$ | async">
-                            <td>#{{ product.id }}</td>
+                        <tr *ngFor="let product of products; let i = index">
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ product.id }}</td>
                             <td>
                                 <div class="fw-bold">{{ product.name }}</div>
                             </td>
@@ -49,7 +75,9 @@
                                     <a [routerLink]="[product.id]" class="btn btn-outline-secondary" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button class="btn btn-outline-danger" title="Eliminar">
+                                    <button class="btn btn-outline-danger" title="Eliminar"
+                                        (click)="openDeleteModal(product.id)"
+                                        [disabled]="deleting">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -58,10 +86,26 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
 
-            <div *ngIf="(products$ | async)?.length === 0" class="text-center py-5 text-muted">
-                <i class="bi bi-box-seam display-1"></i>
-                <p class="mt-3">No hay productos encontrados.</p>
+<!-- Modal de Confirmación -->
+<div class="modal-backdrop fade show" *ngIf="showDeleteModal"></div>
+<div class="modal fade show" tabindex="-1" *ngIf="showDeleteModal" style="display: block;" aria-modal="true"
+    role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" (click)="closeDeleteModal()" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
             </div>
         </div>
     </div>

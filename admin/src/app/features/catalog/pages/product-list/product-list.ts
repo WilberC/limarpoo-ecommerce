@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
 import { ProductService } from '../../../../core/services/product.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { Product } from '../../../../core/models/product.model';
 
 @Component({
@@ -13,11 +13,64 @@ import { Product } from '../../../../core/models/product.model';
   styleUrl: './product-list.scss',
 })
 export class ProductListComponent implements OnInit {
-  products$!: Observable<Product[]>;
+  products: Product[] = [];
+  loading = false;
+  error: string | null = null;
+  deleting = false;
 
-  constructor(private productService: ProductService) {}
+  showDeleteModal = false;
+  productToDeleteId: string | null = null;
+
+  constructor(
+    private productService: ProductService,
+    private toastService: ToastService,
+  ) {}
 
   ngOnInit(): void {
-    this.products$ = this.productService.getProducts();
+    this.loadProducts();
+  }
+
+  loadProducts(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load products';
+        this.loading = false;
+      },
+    });
+  }
+
+  openDeleteModal(productId: string): void {
+    this.productToDeleteId = productId;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.productToDeleteId = null;
+  }
+
+  confirmDelete(): void {
+    if (this.productToDeleteId) {
+      this.deleting = true;
+      this.productService.deleteProduct(this.productToDeleteId).subscribe({
+        next: () => {
+          this.toastService.success('Product deleted successfully');
+          this.loadProducts();
+          this.closeDeleteModal();
+          this.deleting = false;
+        },
+        error: (err) => {
+          this.deleting = false;
+          this.closeDeleteModal();
+        },
+      });
+    }
   }
 }

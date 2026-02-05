@@ -12,6 +12,7 @@ const productController = new ProductController();
  *       type: object
  *       required:
  *         - name
+ *         - description
  *         - price
  *         - sku
  *         - stock_quantity

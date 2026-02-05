@@ -1,4 +1,23 @@
-<div class="container-fluid" *ngIf="!loading && customer; else loadingTpl">
+<!-- Error State -->
+<div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadCustomerData(route.snapshot.paramMap.get('id')!)">
+        <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+    </button>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted">Cargando perfil del cliente...</p>
+    </div>
+</div>
+
+<!-- Content State -->
+<div *ngIf="!loading && !error && customer" class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3">{{ customer.name }}</h2>
         <button class="btn btn-outline-secondary" routerLink="/customers">
@@ -8,11 +27,11 @@
 
     <div class="row">
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm h-100 mb-4">
                 <div class="card-body text-center">
                     <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto mb-3"
                         style="width: 80px; height: 80px; font-size: 2rem;">
-                        {{ customer.name?.charAt(0) || 'C' }}
+                        {{ customer.name?.charAt(0)?.toUpperCase() || 'C' }}
                     </div>
                     <h5 class="card-title">{{ customer.name }}</h5>
                     <p class="text-muted mb-4">Cliente desde {{ customer.joinDate | date:'yyyy' }}</p>
@@ -22,12 +41,29 @@
                             <i class="bi bi-envelope me-2 text-muted"></i> {{ customer.email }}
                         </li>
                         <li class="list-group-item px-0">
-                            <i class="bi bi-phone me-2 text-muted"></i> {{ customer.phone }}
+                            <i class="bi bi-phone me-2 text-muted"></i> {{ customer.phone || 'N/A' }}
                         </li>
                         <li class="list-group-item px-0">
-                            <i class="bi bi-geo-alt me-2 text-muted"></i> Madrid, España
+                            <i class="bi bi-bag me-2 text-muted"></i> {{ customer.totalOrders }} Pedidos
                         </li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- Profile Information -->
+            <div class="card shadow-sm h-100" *ngIf="profile">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Información del Perfil</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Nombre Completo</label>
+                        <div class="fw-bold">{{ profile.first_name }} {{ profile.last_name }}</div>
+                    </div>
+                    <div>
+                        <label class="form-label small text-muted">Teléfono</label>
+                        <div class="fw-bold">{{ profile.phone || 'No proporcionado' }}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,13 +111,35 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<ng-template #loadingTpl>
-    <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
+        <!-- Addresses Section -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Direcciones de Envío</h5>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="addresses.length === 0" class="text-center py-4 text-muted">
+                        <i class="bi bi-geo-alt display-4"></i>
+                        <p class="mt-2">No hay direcciones registradas</p>
+                    </div>
+
+                    <div *ngIf="addresses.length > 0" class="row g-3">
+                        <div *ngFor="let address of addresses" class="col-md-6">
+                            <div class="border rounded p-3" [class.border-primary]="address.is_default" [class.bg-light]="address.is_default">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-0">
+                                        {{ address.street }}
+                                        <span *ngIf="address.is_default" class="badge bg-primary ms-2">Por defecto</span>
+                                    </h6>
+                                </div>
+                                <p class="mb-1 small">{{ address.city }}, {{ address.zip_code }}</p>
+                                <p class="mb-0 small text-muted">{{ address.country }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</ng-template>
+</div>

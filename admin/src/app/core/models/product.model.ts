@@ -1,7 +1,7 @@
 export interface Product {
   id: string; // Changed from number to string to match UUID
   name: string;
-  description?: string; // Added optional
+  description: string;
   sku: string;
   price: number;
   stock_quantity: number; // Mapped from stock (backend uses stock_quantity)

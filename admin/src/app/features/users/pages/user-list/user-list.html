@@ -2,16 +2,40 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3">Usuarios del Sistema</h2>
         <div>
-            <button class="btn btn-outline-secondary me-2">Gestionar Roles</button>
-            <button class="btn btn-primary">
+            <button class="btn btn-outline-secondary me-2" [disabled]="loading">Gestionar Roles</button>
+            <button class="btn btn-primary" [disabled]="loading">
                 <i class="bi bi-person-plus me-2"></i>Invitar Usuario
             </button>
         </div>
     </div>
 
-    <div class="card shadow-sm">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted">Cargando usuarios...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
+        <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadUsers()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+        </button>
+    </div>
+
+    <!-- Content State -->
+    <div *ngIf="!loading && !error" class="card shadow-sm">
         <div class="card-body">
-            <div class="table-responsive">
+            <div *ngIf="users.length === 0" class="text-center py-5 text-muted">
+                <i class="bi bi-people display-1"></i>
+                <p class="mt-3">No hay usuarios encontrados.</p>
+            </div>
+
+            <div *ngIf="users.length > 0" class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
@@ -23,14 +47,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let user of users$ | async">
+                        <tr *ngFor="let user of users">
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2"
                                         style="width: 32px; height: 32px;">
-                                        {{ user.firstName.charAt(0) || 'U' }}
+                                        {{ user.email?.charAt(0)?.toUpperCase() || 'U' }}
                                     </div>
-                                    <div class="fw-bold">{{ user.firstName }} {{ user.lastName }}</div>
+                                    <div class="fw-bold">{{ user.email }}</div>
                                 </div>
                             </td>
                             <td>{{ user.email }}</td>

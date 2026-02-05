@@ -1,1 +1,96 @@
-<p>main-layout works!</p>
+<div class="d-flex" style="min-height: 100vh">
+  <!-- Sidebar Navigation -->
+  <nav class="bg-dark text-white p-3" style="width: 250px; min-height: 100vh">
+    <div class="mb-4">
+      <h5 class="fw-bold mb-1">Limarpoo Admin</h5>
+      <small class="text-muted">E-commerce Management</small>
+    </div>
+
+    <hr class="bg-secondary" />
+
+    <ul class="nav flex-column gap-2">
+      <li class="nav-item">
+        <a routerLink="/catalog" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-box"></i> Catalog
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/orders" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-bag"></i> Orders
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/customers" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-people"></i> Customers
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/users" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-person-gear"></i> Users & Roles
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/inventory" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-building"></i> Inventory
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/content" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-file-text"></i> Content
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/reports" routerLinkActive="active" class="nav-link text-white">
+          <i class="bi bi-graph-up"></i> Reports
+        </a>
+      </li>
+    </ul>
+
+    <hr class="bg-secondary mt-4" />
+
+    <div class="text-center py-3 border-top border-secondary">
+      <small class="text-muted">{{ (currentUser$ | async)?.email }}</small>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="flex-grow-1 bg-light">
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Admin Dashboard</span>
+
+        <div class="ms-auto">
+          <div class="dropdown">
+            <button
+              class="btn btn-sm btn-outline-secondary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="bi bi-person-circle"></i> {{ (currentUser$ | async)?.email }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Profile Settings</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <button class="dropdown-item" (click)="logout()">
+                  <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="p-4">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Toast Notifications -->
+  <app-toast-container></app-toast-container>
+</div>
+
