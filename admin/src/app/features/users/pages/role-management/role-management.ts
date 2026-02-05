@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../../core/services/user.service';
@@ -23,6 +23,7 @@ export class RoleManagementComponent implements OnInit {
   constructor(
     private userService: UserService,
     private toastService: ToastService,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -35,12 +36,16 @@ export class RoleManagementComponent implements OnInit {
 
     this.userService.getUsers().subscribe({
       next: (users) => {
-        this.users = users;
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.users = users;
+          this.loading = false;
+        });
       },
       error: (err) => {
-        this.error = 'Failed to load users';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load users';
+          this.loading = false;
+        });
       },
     });
   }
@@ -53,16 +58,20 @@ export class RoleManagementComponent implements OnInit {
       .updateUser(userId, { role: newRole as 'ADMIN' | 'CUSTOMER' | 'STAFF' })
       .subscribe({
         next: (user) => {
-          const index = this.users.findIndex((u) => u.id === userId);
-          if (index !== -1) {
-            this.users[index] = user;
-          }
-          this.toastService.success(`Role updated to ${newRole}`);
-          this.updatingUserId = null;
+          this.ngZone.run(() => {
+            const index = this.users.findIndex((u) => u.id === userId);
+            if (index !== -1) {
+              this.users[index] = user;
+            }
+            this.toastService.success(`Role updated to ${newRole}`);
+            this.updatingUserId = null;
+          });
         },
         error: (err) => {
-          this.updatingUserId = null;
-          // Error handled by interceptor
+          this.ngZone.run(() => {
+            this.updatingUserId = null;
+            // Error handled by interceptor
+          });
         },
       });
   }

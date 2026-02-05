@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
@@ -25,6 +25,7 @@ export class ProductListComponent implements OnInit {
     private productService: ProductService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -38,16 +39,20 @@ export class ProductListComponent implements OnInit {
     console.log('Loading products...');
     this.productService.getProducts().subscribe({
       next: (products) => {
-        console.log('Products loaded:', products);
-        this.products = products;
-        this.loading = false;
-        this.cdr.markForCheck();
+        this.ngZone.run(() => {
+          console.log('Products loaded:', products);
+          this.products = products;
+          this.loading = false;
+          this.cdr.markForCheck();
+        });
       },
       error: (err) => {
-        console.error('Error loading products:', err);
-        this.error = 'Failed to load products';
-        this.loading = false;
-        this.cdr.markForCheck();
+        this.ngZone.run(() => {
+          console.error('Error loading products:', err);
+          this.error = 'Failed to load products';
+          this.loading = false;
+          this.cdr.markForCheck();
+        });
       },
       complete: () => {
         console.log('Products subscription completed');
@@ -70,14 +75,18 @@ export class ProductListComponent implements OnInit {
       this.deleting = true;
       this.productService.deleteProduct(this.productToDeleteId).subscribe({
         next: () => {
-          this.toastService.success('Product deleted successfully');
-          this.loadProducts();
-          this.closeDeleteModal();
-          this.deleting = false;
+          this.ngZone.run(() => {
+            this.toastService.success('Product deleted successfully');
+            this.loadProducts();
+            this.closeDeleteModal();
+            this.deleting = false;
+          });
         },
         error: (err) => {
-          this.deleting = false;
-          this.closeDeleteModal();
+          this.ngZone.run(() => {
+            this.deleting = false;
+            this.closeDeleteModal();
+          });
         },
       });
     }

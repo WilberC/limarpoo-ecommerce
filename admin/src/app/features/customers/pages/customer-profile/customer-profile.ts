@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
@@ -34,6 +34,7 @@ export class CustomerProfileComponent implements OnInit {
     private customerProfileService: CustomerProfileService,
     private addressService: AddressService,
     private toastService: ToastService,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -54,21 +55,25 @@ export class CustomerProfileComponent implements OnInit {
       addresses: this.addressService.getUserAddresses(id),
     }).subscribe({
       next: ({ user, orders, profile, addresses }) => {
-        this.customer = {
-          ...user,
-          name: user.email,
-          phone: profile?.phone || 'N/A',
-          totalOrders: orders.length,
-          joinDate: new Date(),
-        };
-        this.profile = profile;
-        this.orders = orders;
-        this.addresses = addresses;
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.customer = {
+            ...user,
+            name: user.email,
+            phone: profile?.phone || 'N/A',
+            totalOrders: orders.length,
+            joinDate: new Date(),
+          };
+          this.profile = profile;
+          this.orders = orders;
+          this.addresses = addresses;
+          this.loading = false;
+        });
       },
       error: (err) => {
-        this.error = 'Failed to load customer profile';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load customer profile';
+          this.loading = false;
+        });
       },
     });
   }

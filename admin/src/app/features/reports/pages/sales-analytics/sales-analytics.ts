@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../../../core/services/order.service';
 import { UserService } from '../../../../core/services/user.service';
@@ -25,7 +25,8 @@ export class SalesAnalyticsComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private userService: UserService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -41,16 +42,20 @@ export class SalesAnalyticsComponent implements OnInit {
       users: this.userService.getUsers(),
     }).subscribe({
       next: ({ orders, users }) => {
-        this.totalOrders = orders.length;
-        this.totalCustomers = users.length;
-        this.totalRevenue = orders.reduce((acc, order) => acc + Number(order.total_amount), 0);
-        this.averageOrderValue = this.totalOrders > 0 ? this.totalRevenue / this.totalOrders : 0;
-        this.pendingOrders = orders.filter((o) => o.status === 'PENDING').length;
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.totalOrders = orders.length;
+          this.totalCustomers = users.length;
+          this.totalRevenue = orders.reduce((acc, order) => acc + Number(order.total_amount), 0);
+          this.averageOrderValue = this.totalOrders > 0 ? this.totalRevenue / this.totalOrders : 0;
+          this.pendingOrders = orders.filter((o) => o.status === 'PENDING').length;
+          this.loading = false;
+        });
       },
       error: (err) => {
-        this.error = 'Failed to load analytics';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load analytics';
+          this.loading = false;
+        });
       },
     });
   }

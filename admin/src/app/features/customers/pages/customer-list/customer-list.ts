@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
@@ -16,7 +16,7 @@ export class CustomerListComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private ngZone: NgZone) {}
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -28,18 +28,22 @@ export class CustomerListComponent implements OnInit {
 
     this.userService.getUsers().subscribe({
       next: (users) => {
-        this.customers = users.map((user) => ({
-          ...user,
-          name: user.email,
-          phone: 'N/A',
-          totalOrders: 0,
-          joinDate: new Date(),
-        }));
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.customers = users.map((user) => ({
+            ...user,
+            name: user.email,
+            phone: 'N/A',
+            totalOrders: 0,
+            joinDate: new Date(),
+          }));
+          this.loading = false;
+        });
       },
       error: (err) => {
-        this.error = 'Failed to load customers';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load customers';
+          this.loading = false;
+        });
       },
     });
   }

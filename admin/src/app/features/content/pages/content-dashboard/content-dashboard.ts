@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ArticleService } from '../../../../core/services/article.service';
@@ -20,7 +20,8 @@ export class ContentDashboardComponent implements OnInit {
 
   constructor(
     private articleService: ArticleService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -33,12 +34,16 @@ export class ContentDashboardComponent implements OnInit {
 
     this.articleService.getAllArticles().subscribe({
       next: (articles) => {
-        this.articles = articles;
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.articles = articles;
+          this.loading = false;
+        });
       },
       error: (err) => {
-        this.error = 'Failed to load articles';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load articles';
+          this.loading = false;
+        });
       },
     });
   }
@@ -48,12 +53,16 @@ export class ContentDashboardComponent implements OnInit {
       this.deletingId = id;
       this.articleService.deleteArticle(id).subscribe({
         next: () => {
-          this.toastService.success('Article deleted successfully');
-          this.loadArticles();
-          this.deletingId = null;
+          this.ngZone.run(() => {
+            this.toastService.success('Article deleted successfully');
+            this.loadArticles();
+            this.deletingId = null;
+          });
         },
         error: () => {
-          this.deletingId = null;
+          this.ngZone.run(() => {
+            this.deletingId = null;
+          });
         },
       });
     }

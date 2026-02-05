@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -106,7 +106,8 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private ngZone: NgZone
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -134,12 +135,16 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(email, password).subscribe({
       next: () => {
-        this.toastService.success('Login successful!');
-        this.router.navigate([this.returnUrl]);
+        this.ngZone.run(() => {
+          this.toastService.success('Login successful!');
+          this.router.navigate([this.returnUrl]);
+        });
       },
       error: (error) => {
-        this.loading = false;
-        // Error toast is handled by the error interceptor
+        this.ngZone.run(() => {
+          this.loading = false;
+          // Error toast is handled by the error interceptor
+        });
       },
     });
   }

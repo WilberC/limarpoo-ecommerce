@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -28,7 +28,8 @@ export class ContentEditorComponent implements OnInit {
     private router: Router,
     private articleService: ArticleService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private ngZone: NgZone
   ) {
     this.articleForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -50,15 +51,19 @@ export class ContentEditorComponent implements OnInit {
 
     this.articleService.getArticleById(id).subscribe({
       next: (article) => {
-        this.articleForm.patchValue({
-          title: article.title,
-          content: article.content,
+        this.ngZone.run(() => {
+          this.articleForm.patchValue({
+            title: article.title,
+            content: article.content,
+          });
+          this.loading = false;
         });
-        this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load article';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load article';
+          this.loading = false;
+        });
       },
     });
   }
@@ -83,14 +88,18 @@ export class ContentEditorComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.saving = false;
-        const action = this.isEditMode ? 'updated' : 'created';
-        this.toastService.success(`Article ${action} successfully`);
-        this.router.navigate(['/content']);
+        this.ngZone.run(() => {
+          this.saving = false;
+          const action = this.isEditMode ? 'updated' : 'created';
+          this.toastService.success(`Article ${action} successfully`);
+          this.router.navigate(['/content']);
+        });
       },
       error: (err) => {
-        this.saving = false;
-        // Error handled by interceptor
+        this.ngZone.run(() => {
+          this.saving = false;
+          // Error handled by interceptor
+        });
       },
     });
   }

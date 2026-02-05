@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
@@ -16,7 +16,7 @@ export class StockListComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private ngZone: NgZone) {}
 
   ngOnInit(): void {
     this.loadStock();
@@ -28,12 +28,16 @@ export class StockListComponent implements OnInit {
 
     this.productService.getProducts().subscribe({
       next: (products) => {
-        this.products = products;
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.products = products;
+          this.loading = false;
+        });
       },
       error: (err) => {
-        this.error = 'Failed to load stock';
-        this.loading = false;
+        this.ngZone.run(() => {
+          this.error = 'Failed to load stock';
+          this.loading = false;
+        });
       },
     });
   }

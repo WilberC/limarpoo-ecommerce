@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -28,6 +28,7 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private toastService: ToastService,
+    private ngZone: NgZone,
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
@@ -52,7 +53,11 @@ export class ProductDetailComponent implements OnInit {
 
   loadCategories(): void {
     this.categoryService.getCategories().subscribe({
-      next: (categories) => (this.categories = categories),
+      next: (categories) => {
+        this.ngZone.run(() => {
+          this.categories = categories;
+        });
+      },
       error: () => {
         this.toastService.error('Failed to load categories');
       },
@@ -63,16 +68,20 @@ export class ProductDetailComponent implements OnInit {
     this.loading = true;
     this.productService.getProductById(id).subscribe({
       next: (product) => {
-        this.loading = false;
-        if (product) {
-          this.productForm.patchValue(product);
-        } else {
-          this.router.navigate(['/catalog']);
-        }
+        this.ngZone.run(() => {
+          this.loading = false;
+          if (product) {
+            this.productForm.patchValue(product);
+          } else {
+            this.router.navigate(['/catalog']);
+          }
+        });
       },
       error: () => {
-        this.loading = false;
-        this.router.navigate(['/catalog']);
+        this.ngZone.run(() => {
+          this.loading = false;
+          this.router.navigate(['/catalog']);
+        });
       },
     });
   }
@@ -85,25 +94,33 @@ export class ProductDetailComponent implements OnInit {
       if (this.isEditMode && this.productId) {
         this.productService.updateProduct(this.productId, productData).subscribe({
           next: () => {
-            this.loading = false;
-            this.toastService.success('Product updated successfully');
-            this.router.navigate(['/catalog']);
+            this.ngZone.run(() => {
+              this.loading = false;
+              this.toastService.success('Product updated successfully');
+              this.router.navigate(['/catalog']);
+            });
           },
           error: (err) => {
-            this.loading = false;
-            // Error toast handled by error interceptor
+            this.ngZone.run(() => {
+              this.loading = false;
+              // Error toast handled by error interceptor
+            });
           },
         });
       } else {
         this.productService.createProduct(productData).subscribe({
           next: () => {
-            this.loading = false;
-            this.toastService.success('Product created successfully');
-            this.router.navigate(['/catalog']);
+            this.ngZone.run(() => {
+              this.loading = false;
+              this.toastService.success('Product created successfully');
+              this.router.navigate(['/catalog']);
+            });
           },
           error: (err) => {
-            this.loading = false;
-            // Error toast handled by error interceptor
+            this.ngZone.run(() => {
+              this.loading = false;
+              // Error toast handled by error interceptor
+            });
           },
         });
       }
