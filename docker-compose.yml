@@ -5,8 +5,8 @@ services:
     image: postgres:15-alpine
     container_name: limarpoo-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-limarpoo_core}
     ports:
       - "5432:5432"
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: limarpoo-core
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-limarpoo_core}?schema=public
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-limarpoo_core}?schema=public
       - PORT=3000
     ports:
       - "3000:3000"
