@@ -1,10 +1,11 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3">Niveles de Stock</h2>
-        <button class="btn btn-secondary" [disabled]="loading">
+        <button class="btn btn-secondary" [disabled]="loading" (click)="downloadCSV()">
             <i class="bi bi-download me-2"></i>Exportar CSV
         </button>
     </div>
+
 
     <!-- Loading State -->
     <div *ngIf="loading" class="card shadow-sm">
@@ -61,7 +62,7 @@
                                 <span *ngIf="product.stock_quantity === 0" class="badge bg-danger">Agotado</span>
                             </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-outline-primary">
+                                <button class="btn btn-sm btn-outline-primary" [routerLink]="['/catalog', product.id]">
                                     <i class="bi bi-box-arrow-in-down me-1"></i>Ajustar
                                 </button>
                             </td>

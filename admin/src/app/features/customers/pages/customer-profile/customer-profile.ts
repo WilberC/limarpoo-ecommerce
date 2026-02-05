@@ -10,7 +10,8 @@ import { Customer } from '../../../../core/models/customer.model';
 import { Order } from '../../../../core/models/order.model';
 import { CustomerProfile } from '../../../../core/models/customer-profile.model';
 import { Address } from '../../../../core/models/address.model';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-customer-profile',
@@ -48,13 +49,36 @@ export class CustomerProfileComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
+    console.log('Loading customer data for ID:', id);
+
     forkJoin({
-      user: this.userService.getUserById(id),
-      orders: this.orderService.getOrdersByUserId(id),
-      profile: this.customerProfileService.getProfileByUserId(id),
-      addresses: this.addressService.getUserAddresses(id),
+      user: this.userService.getUserById(id).pipe(
+        catchError((err) => {
+          console.error('Failed to load user:', err);
+          throw err; // User is required, so we throw
+        }),
+      ),
+      orders: this.orderService.getOrdersByUserId(id).pipe(
+        catchError((err) => {
+          console.error('Failed to load orders:', err);
+          return of([]); // Orders are optional, return empty array
+        }),
+      ),
+      profile: this.customerProfileService.getProfileByUserId(id).pipe(
+        catchError((err) => {
+          console.warn('Failed to load profile (this might be expected):', err);
+          return of(null); // Profile is optional, return null
+        }),
+      ),
+      addresses: this.addressService.getUserAddresses(id).pipe(
+        catchError((err) => {
+          console.warn('Failed to load addresses:', err);
+          return of([]); // Addresses are optional, return empty array
+        }),
+      ),
     }).subscribe({
       next: ({ user, orders, profile, addresses }) => {
+        console.log('Data loaded successfully:', { user, orders, profile, addresses });
         this.ngZone.run(() => {
           this.customer = {
             ...user,
@@ -63,16 +87,19 @@ export class CustomerProfileComponent implements OnInit {
             totalOrders: orders.length,
             joinDate: new Date(),
           };
-          this.profile = profile;
+          this.profile = profile || undefined;
           this.orders = orders;
           this.addresses = addresses;
           this.loading = false;
+          console.log('Loading complete, loading flag set to false');
         });
       },
       error: (err) => {
+        console.error('Critical error loading customer data:', err);
         this.ngZone.run(() => {
           this.error = 'Failed to load customer profile';
           this.loading = false;
+          this.toastService.error('Failed to load customer profile');
         });
       },
     });
