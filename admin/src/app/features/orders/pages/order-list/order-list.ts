@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { OrderService } from '../../../../core/services/order.service';
 import { Order } from '../../../../core/models/order.model';
@@ -8,12 +9,14 @@ import { Order } from '../../../../core/models/order.model';
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './order-list.html',
   styleUrl: './order-list.scss',
 })
 export class OrderListComponent implements OnInit {
   orders: Order[] = [];
+  filteredOrders: Order[] = [];
+  searchTerm = '';
   loading = false;
   error: string | null = null;
 
@@ -42,6 +45,7 @@ export class OrderListComponent implements OnInit {
       .subscribe({
         next: (orders) => {
           this.orders = orders;
+          this.filteredOrders = orders;
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -50,5 +54,22 @@ export class OrderListComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  filterOrders(): void {
+    const term = this.searchTerm.toLowerCase().trim();
+
+    if (!term) {
+      this.filteredOrders = this.orders;
+    } else {
+      this.filteredOrders = this.orders.filter((order) => {
+        const orderId = order.id.toLowerCase();
+        const customerEmail = (order.user?.email || '').toLowerCase();
+
+        return orderId.includes(term) || customerEmail.includes(term);
+      });
+    }
+
+    this.cdr.detectChanges();
   }
 }
