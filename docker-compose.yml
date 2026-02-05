@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: limarpoo-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-limarpoo_core}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - limarpoo-network
+
+  core:
+    build:
+      context: ./core
+      dockerfile: Dockerfile
+    container_name: limarpoo-core
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-limarpoo_core}?schema=public
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    develop:
+      watch:
+        - action: sync
+          path: ./core/src
+          target: /app/src
+        - action: rebuild
+          path: ./core/package.json
+    networks:
+      - limarpoo-network
+
+volumes:
+  postgres_data:
+
+networks:
+  limarpoo-network:
+    driver: bridge

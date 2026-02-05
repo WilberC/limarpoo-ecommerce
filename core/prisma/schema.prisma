@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  STAFF
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+}
+
+model User {
+  id            String    @id @default(uuid(7))
+  email         String    @unique
+  password_hash String
+  role          Role      @default(CUSTOMER)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  profile       CustomerProfile?
+  addresses     Address[]
+  orders        Order[]
+  reviews       Review[]
+  articles      Article[]
+
+  @@map("users")
+}
+
+model CustomerProfile {
+  id         String   @id @default(uuid(7))
+  user_id    String   @unique
+  first_name String
+  last_name  String
+  phone      String?
+
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@map("customer_profiles")
+}
+
+model Address {
+  id         String   @id @default(uuid(7))
+  user_id    String
+  street     String
+  city       String
+  country    String
+  zip_code   String
+  is_default Boolean  @default(false)
+
+  user       User     @relation(fields: [user_id], references: [id])
+  orders     Order[]  // Relation for shipping address
+
+  @@map("addresses")
+}
+
+model Category {
+  id        String     @id @default(uuid(7))
+  name      String
+  parent_id String?
+
+  parent    Category?  @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             String      @id @default(uuid(7))
+  name           String
+  description    String      @db.Text
+  price          Decimal     @db.Decimal(10, 2)
+  sku            String      @unique
+  stock_quantity Int
+  category_id    String
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+
+  category       Category    @relation(fields: [category_id], references: [id])
+  items          OrderItem[]
+  reviews        Review[]
+
+  @@map("products")
+}
+
+model Review {
+  id         String   @id @default(uuid(7))
+  user_id    String
+  product_id String
+  rating     Int
+  comment    String?  @db.Text
+  created_at DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
+
+  @@map("reviews")
+}
+
+model Order {
+  id                  String      @id @default(uuid(7))
+  user_id             String
+  status              OrderStatus @default(PENDING)
+  total_amount        Decimal     @db.Decimal(10, 2)
+  shipping_address_id String
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+
+  user                User        @relation(fields: [user_id], references: [id])
+  shipping_address    Address     @relation(fields: [shipping_address_id], references: [id])
+  items               OrderItem[]
+  payment             Payment?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String  @id @default(uuid(7))
+  order_id          String
+  product_id        String
+  quantity          Int
+  price_at_purchase Decimal @db.Decimal(10, 2)
+
+  order             Order   @relation(fields: [order_id], references: [id])
+  product           Product @relation(fields: [product_id], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id             String          @id @default(uuid(7))
+  order_id       String          @unique
+  provider       PaymentProvider
+  transaction_id String
+  status         String
+  amount         Decimal         @db.Decimal(10, 2)
+  created_at     DateTime        @default(now())
+
+  order          Order           @relation(fields: [order_id], references: [id])
+
+  @@map("payments")
+}
+
+model Article {
+  id           String   @id @default(uuid(7))
+  title        String
+  content      String   @db.Text
+  author_id    String
+  published_at DateTime @default(now())
+
+  author       User     @relation(fields: [author_id], references: [id])
+
+  @@map("articles")
+}
