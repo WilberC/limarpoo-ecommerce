@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MockDataService } from '../../../../core/services/mock-data.service';
+import { ProductService } from '../../../../core/services/product.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -14,22 +14,22 @@ import { MockDataService } from '../../../../core/services/mock-data.service';
 export class ProductDetailComponent implements OnInit {
   productForm: FormGroup;
   isEditMode = false;
-  productId: number | null = null;
+  productId: string | null = null;
   loading = false;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private mockService: MockDataService,
+    private productService: ProductService,
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       sku: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
-      stock: [0, [Validators.required, Validators.min(0)]],
-      category: ['', Validators.required],
-      status: ['Active', Validators.required],
+      stock_quantity: [0, [Validators.required, Validators.min(0)]],
+      category_id: ['', Validators.required],
+      // status: ['Active', Validators.required], // Status removed as per model
     });
   }
 
@@ -37,33 +37,51 @@ export class ProductDetailComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
       this.isEditMode = true;
-      this.productId = +id;
+      this.productId = id;
       this.loadProduct(this.productId);
     }
   }
 
-  loadProduct(id: number): void {
+  loadProduct(id: string): void {
     this.loading = true;
-    this.mockService.getProductById(id).subscribe((product) => {
-      this.loading = false;
-      if (product) {
-        this.productForm.patchValue(product);
-      } else {
-        // Handle not found
+    this.productService.getProductById(id).subscribe({
+      next: (product) => {
+        this.loading = false;
+        if (product) {
+          this.productForm.patchValue(product);
+        } else {
+          this.router.navigate(['/catalog']);
+        }
+      },
+      error: () => {
+        this.loading = false;
         this.router.navigate(['/catalog']);
-      }
+      },
     });
   }
 
   onSubmit(): void {
     if (this.productForm.valid) {
       this.loading = true;
-      console.log('Saving product:', this.productForm.value);
-      // Simulate save
-      setTimeout(() => {
-        this.loading = false;
-        this.router.navigate(['/catalog']);
-      }, 1000);
+      const productData = this.productForm.value;
+
+      if (this.isEditMode && this.productId) {
+        this.productService.updateProduct(this.productId, productData).subscribe({
+          next: () => {
+            this.loading = false;
+            this.router.navigate(['/catalog']);
+          },
+          error: () => (this.loading = false),
+        });
+      } else {
+        this.productService.createProduct(productData).subscribe({
+          next: () => {
+            this.loading = false;
+            this.router.navigate(['/catalog']);
+          },
+          error: () => (this.loading = false),
+        });
+      }
     }
   }
 }

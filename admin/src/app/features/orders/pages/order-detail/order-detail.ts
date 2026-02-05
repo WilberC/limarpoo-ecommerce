@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MockDataService, Order } from '../../../../core/services/mock-data.service';
-import { map } from 'rxjs/operators';
+import { OrderService } from '../../../../core/services/order.service';
+import { Order } from '../../../../core/models/order.model';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -17,15 +17,13 @@ export class OrderDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private mockService: MockDataService,
+    private orderService: OrderService,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.order$ = this.mockService
-        .getOrders()
-        .pipe(map((orders) => orders.find((o) => o.id === id)));
+      this.order$ = this.orderService.getOrderById(id);
     }
   }
 }

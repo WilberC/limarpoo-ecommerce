@@ -23,22 +23,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let user of users">
+                        <tr *ngFor="let user of users$ | async">
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2"
                                         style="width: 32px; height: 32px;">
-                                        {{ user.name.charAt(0) }}
+                                        {{ user.firstName.charAt(0) || 'U' }}
                                     </div>
-                                    <div class="fw-bold">{{ user.name }}</div>
+                                    <div class="fw-bold">{{ user.firstName }} {{ user.lastName }}</div>
                                 </div>
                             </td>
                             <td>{{ user.email }}</td>
                             <td><span class="badge bg-light text-dark border">{{ user.role }}</span></td>
                             <td>
-                                <span class="badge rounded-pill"
-                                    [ngClass]="user.status === 'Active' ? 'bg-success' : 'bg-secondary'">
-                                    {{ user.status === 'Active' ? 'Activo' : 'Inactivo' }}
+                                <span class="badge rounded-pill bg-success">
+                                    Activo
                                 </span>
                             </td>
                             <td class="text-end">

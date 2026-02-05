@@ -30,19 +30,18 @@
                             </td>
                             <td>{{ product.sku }}</td>
                             <td>
-                                <span class="badge bg-secondary">{{ product.category }}</span>
+                                <span class="badge bg-secondary">{{ product.category_id }}</span>
                             </td>
                             <td>{{ product.price | currency:'PEN' }}</td>
                             <td>
                                 <span
-                                    [ngClass]="{'text-danger': product.stock === 0, 'text-success': product.stock > 10}">
-                                    {{ product.stock }} un.
+                                    [ngClass]="{'text-danger': product.stock_quantity === 0, 'text-success': product.stock_quantity > 10}">
+                                    {{ product.stock_quantity }} un.
                                 </span>
                             </td>
                             <td>
-                                <span class="badge rounded-pill"
-                                    [ngClass]="product.status === 'Active' ? 'bg-success' : 'bg-danger'">
-                                    {{ product.status === 'Active' ? 'Activo' : 'Inactivo' }}
+                                <span class="badge rounded-pill bg-success">
+                                    Activo
                                 </span>
                             </td>
                             <td class="text-end">

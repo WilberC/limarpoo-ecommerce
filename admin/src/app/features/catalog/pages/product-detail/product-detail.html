@@ -25,14 +25,10 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="category" class="form-label">Categoría</label>
-                        <select class="form-select" id="category" formControlName="category">
-                            <option value="">Seleccione...</option>
-                            <option value="Ropa">Ropa</option>
-                            <option value="Calzado">Calzado</option>
-                            <option value="Electrónica">Electrónica</option>
-                            <option value="Joyería">Joyería</option>
-                        </select>
+                        <label for="category" class="form-label">Categoría (ID)</label>
+                        <input type="text" class="form-control" id="category" formControlName="category_id"
+                            placeholder="e.g. cat_123">
+                        <!-- Select removed as we need IDs for now, or dynamic loading of categories -->
                     </div>
 
                     <div class="col-md-4">
@@ -45,22 +41,10 @@
 
                     <div class="col-md-4">
                         <label for="stock" class="form-label">Stock</label>
-                        <input type="number" class="form-control" id="stock" formControlName="stock">
+                        <input type="number" class="form-control" id="stock" formControlName="stock_quantity">
                     </div>
 
-                    <div class="col-12">
-                        <label class="form-label d-block">Estado</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="active" value="Active"
-                                formControlName="status">
-                            <label class="form-check-label" for="active">Activo</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="inactive" value="Inactive"
-                                formControlName="status">
-                            <label class="form-check-label" for="inactive">Inactivo</label>
-                        </div>
-                    </div>
+                    <!-- Status field removed as it is not yet supported by backend -->
                 </div>
 
                 <hr class="my-4">

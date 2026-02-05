@@ -30,7 +30,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-2"
                                         style="width: 32px; height: 32px;">
-                                        {{ customer.name.charAt(0) }}
+                                        {{ customer.name?.charAt(0) || 'C' }}
                                     </div>
                                     <div class="fw-bold">{{ customer.name }}</div>
                                 </div>

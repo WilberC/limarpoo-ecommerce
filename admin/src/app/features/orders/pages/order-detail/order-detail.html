@@ -2,7 +2,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="h3 margin-bottom-0">Pedido {{ order.id }}</h2>
-            <span class="text-muted">Realizado el {{ order.date | date:'dd MMMM yyyy' }}</span>
+            <span class="text-muted">Realizado el {{ order.created_at | date:'dd MMMM yyyy' }}</span>
         </div>
         <button class="btn btn-outline-secondary" routerLink="/orders">
             <i class="bi bi-arrow-left me-2"></i>Volver
@@ -26,8 +26,8 @@
                             <small class="text-muted">SKU: PROD-001</small>
                         </div>
                         <div class="text-end">
-                            <div class="fw-bold">2 x S/{{ (order.total * 0.4).toFixed(2) }}</div>
-                            <div class="text-muted">S/{{ (order.total * 0.8).toFixed(2) }}</div>
+                            <div class="fw-bold">2 x S/{{ (order.total_amount * 0.4).toFixed(2) }}</div>
+                            <div class="text-muted">S/{{ (order.total_amount * 0.8).toFixed(2) }}</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
@@ -39,15 +39,15 @@
                             <small class="text-muted">SKU: PROD-002</small>
                         </div>
                         <div class="text-end">
-                            <div class="fw-bold">1 x S/{{ (order.total * 0.2).toFixed(2) }}</div>
-                            <div class="text-muted">S/{{ (order.total * 0.2).toFixed(2) }}</div>
+                            <div class="fw-bold">1 x S/{{ (order.total_amount * 0.2).toFixed(2) }}</div>
+                            <div class="text-muted">S/{{ (order.total_amount * 0.2).toFixed(2) }}</div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer bg-light">
                     <div class="d-flex justify-content-between fw-bold fs-5">
                         <span>Total</span>
-                        <span>{{ order.total | currency:'PEN' }}</span>
+                        <span>{{ order.total_amount | currency:'PEN' }}</span>
                     </div>
                 </div>
             </div>
@@ -62,10 +62,10 @@
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-3"
                             style="width: 48px; height: 48px; font-size: 1.2rem;">
-                            {{ order.customerName.charAt(0) }}
+                            <div class="fw-bold">{{ order.user_id }}</div>
                         </div>
                         <div>
-                            <h6 class="mb-0">{{ order.customerName }}</h6>
+                            <h6 class="mb-0">ID: {{ order.user_id }}</h6>
                             <small class="text-muted">Cliente Registrado</small>
                         </div>
                     </div>
@@ -85,10 +85,10 @@
                 <div class="card-body">
                     <label class="form-label">Estado del Pedido</label>
                     <select class="form-select mb-3">
-                        <option [selected]="order.status === 'Pending'">Pendiente</option>
-                        <option [selected]="order.status === 'Shipped'">Enviado</option>
-                        <option [selected]="order.status === 'Delivered'">Entregado</option>
-                        <option [selected]="order.status === 'Cancelled'">Cancelado</option>
+                        <option [selected]="order.status === 'PENDING'">Pendiente</option>
+                        <option [selected]="order.status === 'SHIPPED'">Enviado</option>
+                        <option [selected]="order.status === 'DELIVERED'">Entregado</option>
+                        <option [selected]="order.status === 'CANCELLED'">Cancelado</option>
                     </select>
                     <button class="btn btn-primary w-100">Actualizar Estado</button>
                 </div>

@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MockDataService, Customer, Order } from '../../../../core/services/mock-data.service';
+import { UserService } from '../../../../core/services/user.service';
+import { OrderService } from '../../../../core/services/order.service';
+import { Customer } from '../../../../core/models/customer.model';
+import { Order } from '../../../../core/models/order.model';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -18,22 +21,31 @@ export class CustomerProfileComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private mockService: MockDataService,
+    private userService: UserService,
+    private orderService: OrderService,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       forkJoin({
-        customers: this.mockService.getCustomers(),
-        orders: this.mockService.getOrders(),
-      }).subscribe(({ customers, orders }) => {
-        this.customer = customers.find((c) => c.id === +id);
-        if (this.customer) {
-          // Filter orders by name roughly matching for mock data
-          this.orders = orders.filter((o) => o.customerName === this.customer?.name);
-        }
-        this.loading = false;
+        user: this.userService.getUserById(id),
+        orders: this.orderService.getOrdersByUserId(id),
+      }).subscribe({
+        next: ({ user, orders }) => {
+          this.customer = {
+            ...user,
+            name: `${user.firstName} ${user.lastName}`,
+            phone: 'N/A',
+            totalOrders: orders.length,
+            joinDate: new Date(),
+          };
+          this.orders = orders;
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        },
       });
     }
   }

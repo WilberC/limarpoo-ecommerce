@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
-import { MockDataService, Order } from '../../../../core/services/mock-data.service';
+import { OrderService } from '../../../../core/services/order.service';
+import { Order } from '../../../../core/models/order.model';
 
 @Component({
   selector: 'app-order-list',
@@ -14,9 +15,9 @@ import { MockDataService, Order } from '../../../../core/services/mock-data.serv
 export class OrderListComponent implements OnInit {
   orders$!: Observable<Order[]>;
 
-  constructor(private mockService: MockDataService) {}
+  constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
-    this.orders$ = this.mockService.getOrders();
+    this.orders$ = this.orderService.getOrders();
   }
 }

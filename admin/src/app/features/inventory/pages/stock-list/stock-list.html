@@ -26,15 +26,15 @@
                                 <div class="fw-bold">{{ product.name }}</div>
                             </td>
                             <td>{{ product.sku }}</td>
-                            <td>{{ product.category }}</td>
+                            <td>{{ product.category_id }}</td>
                             <td>
-                                <span class="fw-bold">{{ product.stock }}</span>
+                                <span class="fw-bold">{{ product.stock_quantity }}</span>
                             </td>
                             <td>
-                                <span *ngIf="product.stock > 10" class="badge bg-success">En Stock</span>
-                                <span *ngIf="product.stock <= 10 && product.stock > 0"
+                                <span *ngIf="product.stock_quantity > 10" class="badge bg-success">En Stock</span>
+                                <span *ngIf="product.stock_quantity <= 10 && product.stock_quantity > 0"
                                     class="badge bg-warning text-dark">Bajo Stock</span>
-                                <span *ngIf="product.stock === 0" class="badge bg-danger">Agotado</span>
+                                <span *ngIf="product.stock_quantity === 0" class="badge bg-danger">Agotado</span>
                             </td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-primary">
