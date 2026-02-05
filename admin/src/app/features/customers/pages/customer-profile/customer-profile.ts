@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
@@ -21,12 +21,12 @@ import { catchError } from 'rxjs/operators';
   styleUrl: './customer-profile.scss',
 })
 export class CustomerProfileComponent implements OnInit {
-  customer: Customer | undefined;
-  profile: CustomerProfile | undefined;
-  addresses: Address[] = [];
-  orders: Order[] = [];
-  loading = true;
-  error: string | null = null;
+  public customer: Customer | undefined;
+  public profile: CustomerProfile | undefined;
+  public addresses: Address[] = [];
+  public orders: Order[] = [];
+  public loading = true;
+  public error: string | null = null;
 
   constructor(
     public route: ActivatedRoute,
@@ -35,13 +35,26 @@ export class CustomerProfileComponent implements OnInit {
     private customerProfileService: CustomerProfileService,
     private addressService: AddressService,
     private toastService: ToastService,
-    private ngZone: NgZone,
-  ) {}
+    private cdr: ChangeDetectorRef,
+  ) {
+    console.log('CustomerProfileComponent constructor called');
+  }
 
   ngOnInit(): void {
+    console.log('CustomerProfileComponent ngOnInit called');
+    console.log('Route snapshot:', this.route.snapshot);
+    console.log('Route params:', this.route.snapshot.paramMap);
+
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('Customer ID from route:', id);
+
     if (id) {
+      console.log('ID exists, calling loadCustomerData');
       this.loadCustomerData(id);
+    } else {
+      console.error('No customer ID found in route!');
+      this.loading = false;
+      this.error = 'No customer ID provided';
     }
   }
 
@@ -79,28 +92,27 @@ export class CustomerProfileComponent implements OnInit {
     }).subscribe({
       next: ({ user, orders, profile, addresses }) => {
         console.log('Data loaded successfully:', { user, orders, profile, addresses });
-        this.ngZone.run(() => {
-          this.customer = {
-            ...user,
-            name: user.email,
-            phone: profile?.phone || 'N/A',
-            totalOrders: orders.length,
-            joinDate: new Date(),
-          };
-          this.profile = profile || undefined;
-          this.orders = orders;
-          this.addresses = addresses;
-          this.loading = false;
-          console.log('Loading complete, loading flag set to false');
-        });
+        this.customer = {
+          ...user,
+          name: user.email,
+          phone: profile?.phone || 'N/A',
+          totalOrders: orders.length,
+          joinDate: new Date(),
+        };
+        this.profile = profile || undefined;
+        this.orders = orders;
+        this.addresses = addresses;
+        this.loading = false;
+        console.log('Loading complete, loading flag set to false');
+        this.cdr.detectChanges();
+        console.log('Change detection triggered manually');
       },
       error: (err) => {
         console.error('Critical error loading customer data:', err);
-        this.ngZone.run(() => {
-          this.error = 'Failed to load customer profile';
-          this.loading = false;
-          this.toastService.error('Failed to load customer profile');
-        });
+        this.error = 'Failed to load customer profile';
+        this.loading = false;
+        this.toastService.error('Failed to load customer profile');
+        this.cdr.detectChanges();
       },
     });
   }
