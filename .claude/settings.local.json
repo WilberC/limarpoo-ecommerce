@@ -7,7 +7,9 @@
       "Bash(docker exec:*)",
       "Bash(PGPASSWORD=postgres psql:*)",
       "Bash(npx prisma db seed:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

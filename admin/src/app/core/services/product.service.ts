@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Product } from '../models/product.model';
 
@@ -13,7 +14,14 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    console.log('ProductService: Requesting products from', this.apiUrl);
+    return this.http.get<Product[]>(this.apiUrl).pipe(
+      tap(data => console.log('ProductService: Received data:', data)),
+      catchError(error => {
+        console.error('ProductService: Error fetching products:', error);
+        throw error;
+      })
+    );
   }
 
   getProductById(id: string): Observable<Product> {

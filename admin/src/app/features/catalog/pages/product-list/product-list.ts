@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
@@ -24,6 +24,7 @@ export class ProductListComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private toastService: ToastService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -34,15 +35,23 @@ export class ProductListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
+    console.log('Loading products...');
     this.productService.getProducts().subscribe({
       next: (products) => {
+        console.log('Products loaded:', products);
         this.products = products;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
+        console.error('Error loading products:', err);
         this.error = 'Failed to load products';
         this.loading = false;
+        this.cdr.markForCheck();
       },
+      complete: () => {
+        console.log('Products subscription completed');
+      }
     });
   }
 
