@@ -8,7 +8,7 @@ import {
 const prisma = new PrismaClient();
 
 // Hash for "admin123"
-const ADMIN_PASSWORD_HASH = "$2b$10$epGk/lKq.jWk0yG8.5K0Eu/u2T0.y3T0.y3T0.y3T0";
+const ADMIN_PASSWORD_HASH = "$2b$10$EoGM/t2D6EzA3yTWBo1BL.7B9.xy1uEa4XM.uh07NlsBaO16pdY2C";
 
 async function main() {
   console.log('Iniciando el proceso de siembra ("seeding") inteligente...');

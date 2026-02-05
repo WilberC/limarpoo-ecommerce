@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(docker exec:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(npx prisma db seed:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}

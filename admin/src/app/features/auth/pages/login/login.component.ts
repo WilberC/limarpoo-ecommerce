@@ -65,7 +65,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 
         <div class="mt-4 p-3 bg-light rounded">
           <p class="text-muted small mb-1"><strong>Demo Credentials:</strong></p>
-          <p class="text-muted small mb-0">Email: admin@example.com</p>
+          <p class="text-muted small mb-0">Email: admin@limarpoo.com</p>
           <p class="text-muted small">Password: admin123</p>
         </div>
       </div>

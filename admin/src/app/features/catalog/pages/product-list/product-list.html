@@ -58,7 +58,7 @@
                             <td>
                                 <span class="badge bg-secondary">{{ product.category_id }}</span>
                             </td>
-                            <td>{{ product.price | currency:'PEN' }}</td>
+                            <td>{{ +product.price | currency:'PEN' }}</td>
                             <td>
                                 <span
                                     [ngClass]="{'text-danger': product.stock_quantity === 0, 'text-success': product.stock_quantity > 10}">

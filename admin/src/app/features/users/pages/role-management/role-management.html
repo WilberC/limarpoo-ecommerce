@@ -51,18 +51,16 @@
                                 </span>
                             </td>
                             <td>
-                                <select
-                                    class="form-select form-select-sm"
-                                    [value]="user.role"
-                                    (change)="updateRole(user.id, $event)"
-                                    [disabled]="updatingUserId === user.id"
-                                    style="max-width: 150px;">
+                                <select class="form-select form-select-sm" [value]="user.role"
+                                    (change)="updateRole(user.id, $any($event.target).value)"
+                                    [disabled]="updatingUserId === user.id" style="max-width: 150px;">
                                     <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
                                 </select>
                             </td>
                             <td class="text-end">
                                 <span *ngIf="updatingUserId !== user.id" class="badge bg-success">Activo</span>
-                                <span *ngIf="updatingUserId === user.id" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span *ngIf="updatingUserId === user.id" class="spinner-border spinner-border-sm"
+                                    role="status" aria-hidden="true"></span>
                             </td>
                         </tr>
                     </tbody>

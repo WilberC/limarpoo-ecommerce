@@ -28,12 +28,12 @@ export class CustomerProfileComponent implements OnInit {
   error: string | null = null;
 
   constructor(
-    private route: ActivatedRoute,
+    public route: ActivatedRoute,
     private userService: UserService,
     private orderService: OrderService,
     private customerProfileService: CustomerProfileService,
     private addressService: AddressService,
-    private toastService: ToastService
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {

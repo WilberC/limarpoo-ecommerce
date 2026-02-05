@@ -22,7 +22,7 @@ export class RoleManagementComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private toastService: ToastService
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -49,36 +49,38 @@ export class RoleManagementComponent implements OnInit {
     if (!newRole) return;
 
     this.updatingUserId = userId;
-    this.userService.updateUser(userId, { role: newRole as any }).subscribe({
-      next: (user) => {
-        const index = this.users.findIndex((u) => u.id === userId);
-        if (index !== -1) {
-          this.users[index] = user;
-        }
-        this.toastService.success(`Role updated to ${newRole}`);
-        this.updatingUserId = null;
-      },
-      error: (err) => {
-        this.updatingUserId = null;
-        // Error handled by interceptor
-      },
-    });
+    this.userService
+      .updateUser(userId, { role: newRole as 'ADMIN' | 'CUSTOMER' | 'STAFF' })
+      .subscribe({
+        next: (user) => {
+          const index = this.users.findIndex((u) => u.id === userId);
+          if (index !== -1) {
+            this.users[index] = user;
+          }
+          this.toastService.success(`Role updated to ${newRole}`);
+          this.updatingUserId = null;
+        },
+        error: (err) => {
+          this.updatingUserId = null;
+          // Error handled by interceptor
+        },
+      });
   }
 
   getRoleDescription(role: string): string {
     const descriptions: { [key: string]: string } = {
-      'ADMIN': 'Acceso total al sistema',
-      'STAFF': 'Gestión de tienda y operaciones',
-      'CUSTOMER': 'Cliente regular',
+      ADMIN: 'Acceso total al sistema',
+      STAFF: 'Gestión de tienda y operaciones',
+      CUSTOMER: 'Cliente regular',
     };
     return descriptions[role] || role;
   }
 
   getRoleBadgeClass(role: string): string {
     const classes: { [key: string]: string } = {
-      'ADMIN': 'bg-danger',
-      'STAFF': 'bg-warning text-dark',
-      'CUSTOMER': 'bg-info',
+      ADMIN: 'bg-danger',
+      STAFF: 'bg-warning text-dark',
+      CUSTOMER: 'bg-info',
     };
     return classes[role] || 'bg-secondary';
   }
