@@ -1,6 +1,7 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { UserService } from '../../../../core/services/user.service';
 import { Customer } from '../../../../core/models/customer.model';
 
@@ -16,7 +17,10 @@ export class CustomerListComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private userService: UserService, private ngZone: NgZone) {}
+  constructor(
+    private userService: UserService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -25,10 +29,18 @@ export class CustomerListComponent implements OnInit {
   loadCustomers(): void {
     this.loading = true;
     this.error = null;
+    this.cdr.detectChanges();
 
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.ngZone.run(() => {
+    this.userService
+      .getUsers()
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (users) => {
           this.customers = users.map((user) => ({
             ...user,
             name: user.email,
@@ -36,15 +48,13 @@ export class CustomerListComponent implements OnInit {
             totalOrders: 0,
             joinDate: new Date(),
           }));
-          this.loading = false;
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error loading customers:', err);
           this.error = 'Failed to load customers';
-          this.loading = false;
-        });
-      },
-    });
+          this.cdr.detectChanges();
+        },
+      });
   }
 }

@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { ProductService } from '../../../../core/services/product.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Product } from '../../../../core/models/product.model';
@@ -25,7 +26,6 @@ export class ProductListComponent implements OnInit {
     private productService: ProductService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -35,29 +35,32 @@ export class ProductListComponent implements OnInit {
   loadProducts(): void {
     this.loading = true;
     this.error = null;
+    this.cdr.detectChanges();
 
     console.log('Loading products...');
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.ngZone.run(() => {
+    this.productService
+      .getProducts()
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (products) => {
           console.log('Products loaded:', products);
           this.products = products;
-          this.loading = false;
-          this.cdr.markForCheck();
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
           console.error('Error loading products:', err);
           this.error = 'Failed to load products';
-          this.loading = false;
-          this.cdr.markForCheck();
-        });
-      },
-      complete: () => {
-        console.log('Products subscription completed');
-      }
-    });
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          console.log('Products subscription completed');
+        },
+      });
   }
 
   openDeleteModal(productId: string): void {
@@ -73,22 +76,27 @@ export class ProductListComponent implements OnInit {
   confirmDelete(): void {
     if (this.productToDeleteId) {
       this.deleting = true;
-      this.productService.deleteProduct(this.productToDeleteId).subscribe({
-        next: () => {
-          this.ngZone.run(() => {
+      this.cdr.detectChanges();
+
+      this.productService
+        .deleteProduct(this.productToDeleteId)
+        .pipe(
+          finalize(() => {
+            this.deleting = false;
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe({
+          next: () => {
             this.toastService.success('Product deleted successfully');
             this.loadProducts();
             this.closeDeleteModal();
-            this.deleting = false;
-          });
-        },
-        error: (err) => {
-          this.ngZone.run(() => {
-            this.deleting = false;
+          },
+          error: (err) => {
+            console.error('Error deleting product:', err);
             this.closeDeleteModal();
-          });
-        },
-      });
+          },
+        });
     }
   }
 }

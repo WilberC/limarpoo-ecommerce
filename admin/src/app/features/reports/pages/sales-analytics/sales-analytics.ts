@@ -1,5 +1,6 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs/operators';
 import { OrderService } from '../../../../core/services/order.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ToastService } from '../../../../core/services/toast.service';
@@ -26,7 +27,7 @@ export class SalesAnalyticsComponent implements OnInit {
     private orderService: OrderService,
     private userService: UserService,
     private toastService: ToastService,
-    private ngZone: NgZone
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -36,27 +37,32 @@ export class SalesAnalyticsComponent implements OnInit {
   loadAnalytics(): void {
     this.loading = true;
     this.error = null;
+    this.cdr.detectChanges();
 
     forkJoin({
       orders: this.orderService.getOrders(),
       users: this.userService.getUsers(),
-    }).subscribe({
-      next: ({ orders, users }) => {
-        this.ngZone.run(() => {
+    })
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: ({ orders, users }) => {
           this.totalOrders = orders.length;
           this.totalCustomers = users.length;
           this.totalRevenue = orders.reduce((acc, order) => acc + Number(order.total_amount), 0);
           this.averageOrderValue = this.totalOrders > 0 ? this.totalRevenue / this.totalOrders : 0;
           this.pendingOrders = orders.filter((o) => o.status === 'PENDING').length;
-          this.loading = false;
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error loading analytics:', err);
           this.error = 'Failed to load analytics';
-          this.loading = false;
-        });
-      },
-    });
+          this.cdr.detectChanges();
+        },
+      });
   }
 }

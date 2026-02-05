@@ -1,6 +1,7 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../core/models/product.model';
 
@@ -16,7 +17,10 @@ export class StockListComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private productService: ProductService, private ngZone: NgZone) {}
+  constructor(
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.loadStock();
@@ -25,21 +29,27 @@ export class StockListComponent implements OnInit {
   loadStock(): void {
     this.loading = true;
     this.error = null;
+    this.cdr.detectChanges();
 
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.ngZone.run(() => {
+    this.productService
+      .getProducts()
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (products) => {
           this.products = products;
-          this.loading = false;
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error loading stock:', err);
           this.error = 'Failed to load stock';
-          this.loading = false;
-        });
-      },
-    });
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   getStockStatus(quantity: number): string {
