@@ -1,7 +1,8 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { ArticleService } from '../../../../core/services/article.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
@@ -29,7 +30,8 @@ export class ContentEditorComponent implements OnInit {
     private articleService: ArticleService,
     private authService: AuthService,
     private toastService: ToastService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
   ) {
     this.articleForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -48,24 +50,46 @@ export class ContentEditorComponent implements OnInit {
   loadArticle(id: string): void {
     this.loading = true;
     this.error = null;
+    console.log('Starting loadArticle for id:', id);
 
-    this.articleService.getArticleById(id).subscribe({
-      next: (article) => {
-        this.ngZone.run(() => {
-          this.articleForm.patchValue({
-            title: article.title,
-            content: article.content,
+    this.articleService
+      .getArticleById(id)
+      .pipe(
+        finalize(() => {
+          this.ngZone.run(() => {
+            console.log('Finalize: Setting loading to false');
+            this.loading = false;
+            // Force change detection to update the view
+            this.cdr.detectChanges();
           });
-          this.loading = false;
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
-          this.error = 'Failed to load article';
-          this.loading = false;
-        });
-      },
-    });
+        }),
+      )
+      .subscribe({
+        next: (response: any) => {
+          console.log('loadArticle response received:', response);
+          this.ngZone.run(() => {
+            const article = response?.data || response;
+
+            if (!article) {
+              console.error('No article data found in response');
+              this.error = 'Article data not found';
+              return;
+            }
+
+            console.log('Patching form with article data');
+            this.articleForm.patchValue({
+              title: article.title,
+              content: article.content,
+            });
+          });
+        },
+        error: (err) => {
+          console.error('loadArticle error:', err);
+          this.ngZone.run(() => {
+            this.error = 'Failed to load article';
+          });
+        },
+      });
   }
 
   onSubmit(): void {
@@ -82,9 +106,10 @@ export class ContentEditorComponent implements OnInit {
       published_at: new Date(),
     };
 
-    const request = this.isEditMode && this.articleId
-      ? this.articleService.updateArticle(this.articleId, articleData)
-      : this.articleService.createArticle(articleData);
+    const request =
+      this.isEditMode && this.articleId
+        ? this.articleService.updateArticle(this.articleId, articleData)
+        : this.articleService.createArticle(articleData);
 
     request.subscribe({
       next: () => {

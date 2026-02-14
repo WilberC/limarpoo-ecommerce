@@ -1,72 +1,81 @@
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3">Gestión de Contenido (Artículos)</h2>
-        <button class="btn btn-primary" routerLink="new" [disabled]="loading">
-            <i class="bi bi-plus-lg me-2"></i>Nuevo Artículo
-        </button>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h3">Gestión de Contenido (Artículos)</h2>
+    <button class="btn btn-primary" routerLink="new" [disabled]="loading">
+      <i class="bi bi-plus-lg me-2"></i>Nuevo Artículo
+    </button>
+  </div>
 
-    <!-- Loading State -->
-    <div *ngIf="loading" class="card shadow-sm">
-        <div class="card-body text-center py-5">
-            <div class="spinner-border text-primary mb-3" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="text-muted">Cargando artículos...</p>
-        </div>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="card shadow-sm">
+    <div class="card-body text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted">Cargando artículos...</p>
     </div>
+  </div>
 
-    <!-- Error State -->
-    <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
-        <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadArticles()">
-            <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
-        </button>
+  <!-- Error State -->
+  <div
+    *ngIf="error && !loading"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    <i class="bi bi-exclamation-circle me-2"></i><strong>Error:</strong> {{ error }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadArticles()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+    </button>
+  </div>
+
+  <!-- Content State -->
+  <div *ngIf="!loading && !error" class="card shadow-sm">
+    <div class="card-body">
+      <div *ngIf="articles.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-file-text display-1"></i>
+        <p class="mt-3">No hay artículos creados. Crea uno nuevo para empezar.</p>
+      </div>
+
+      <div *ngIf="articles.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Publicado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let article of articles">
+              <td class="fw-bold">{{ article.title }}</td>
+              <td>{{ article.author?.email || 'Unknown' }}</td>
+              <td>{{ article.published_at | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-end">
+                <a [routerLink]="[article.id]" class="btn btn-sm btn-outline-secondary me-2">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteArticle(article.id)"
+                  [disabled]="deletingId === article.id"
+                >
+                  <span *ngIf="deletingId !== article.id">
+                    <i class="bi bi-trash"></i>
+                  </span>
+                  <span *ngIf="deletingId === article.id">
+                    <span
+                      class="spinner-border spinner-border-sm me-1"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  </span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-
-    <!-- Content State -->
-    <div *ngIf="!loading && !error" class="card shadow-sm">
-        <div class="card-body">
-            <div *ngIf="articles.length === 0" class="text-center py-5 text-muted">
-                <i class="bi bi-file-text display-1"></i>
-                <p class="mt-3">No hay artículos creados. Crea uno nuevo para empezar.</p>
-            </div>
-
-            <div *ngIf="articles.length > 0" class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Título</th>
-                            <th>Autor</th>
-                            <th>Publicado</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let article of articles">
-                            <td class="fw-bold">{{ article.title }}</td>
-                            <td>{{ article.author?.email || 'Unknown' }}</td>
-                            <td>{{ article.published_at | date:'dd/MM/yyyy' }}</td>
-                            <td class="text-end">
-                                <a [routerLink]="[article.id, 'edit']" class="btn btn-sm btn-outline-secondary me-2">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button
-                                    class="btn btn-sm btn-outline-danger"
-                                    (click)="deleteArticle(article.id)"
-                                    [disabled]="deletingId === article.id">
-                                    <span *ngIf="deletingId !== article.id">
-                                        <i class="bi bi-trash"></i>
-                                    </span>
-                                    <span *ngIf="deletingId === article.id">
-                                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
