@@ -52,6 +52,8 @@ function excerpt(content: string, max = 120) {
   const stripped = content.replace(/<[^>]+>/g, '')
   return stripped.length > max ? stripped.slice(0, max) + '…' : stripped
 }
+
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:3001'
 </script>
 
 <template>
@@ -87,7 +89,7 @@ function excerpt(content: string, max = 120) {
             Descubre miles de productos de calidad a precios competitivos. Envío rápido, pagos seguros y atención al cliente excepcional — todo en un solo lugar.
           </p>
           <div class="flex flex-wrap gap-4">
-            <a href="http://localhost:3001" class="btn-primary bg-accent-500 hover:bg-accent-600 text-gray-900 font-bold">
+            <a :href="storefrontUrl" class="btn-primary bg-accent-500 hover:bg-accent-600 text-gray-900 font-bold">
               Empezar a Comprar
               <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -194,7 +196,7 @@ function excerpt(content: string, max = 120) {
         <a
           v-for="cat in categories"
           :key="cat.name"
-          href="http://localhost:3001/products"
+          :href="`${storefrontUrl}/products`"
           class="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-white border border-gray-100 hover:border-primary-200 hover:shadow-md transition-all duration-200"
         >
           <span class="text-4xl group-hover:scale-110 transition-transform duration-200">{{ cat.emoji }}</span>
@@ -202,7 +204,7 @@ function excerpt(content: string, max = 120) {
         </a>
       </div>
       <div class="text-center mt-10">
-        <a href="http://localhost:3001/products" class="btn-primary">Ver Todos los Productos</a>
+        <a :href="`${storefrontUrl}/products`" class="btn-primary">Ver Todos los Productos</a>
       </div>
     </div>
   </section>
@@ -343,7 +345,7 @@ function excerpt(content: string, max = 120) {
         Únete a miles de clientes satisfechos y vive la forma más sencilla de comprar online en Perú.
       </p>
       <div class="flex flex-wrap justify-center gap-4">
-        <a href="http://localhost:3001" class="btn-primary bg-accent-500 hover:bg-accent-600 text-gray-900 font-bold px-8 py-4 text-lg">
+        <a :href="storefrontUrl" class="btn-primary bg-accent-500 hover:bg-accent-600 text-gray-900 font-bold px-8 py-4 text-lg">
           Ir a la Tienda — Es Gratis
         </a>
         <RouterLink to="/contact" class="btn-outline px-8 py-4 text-lg">

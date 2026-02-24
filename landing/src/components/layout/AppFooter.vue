@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const year = new Date().getFullYear()
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:3001'
 
 const links = {
   company: [
@@ -9,9 +10,9 @@ const links = {
     { label: 'Preguntas Frecuentes', to: '/faq' },
   ],
   shop: [
-    { label: 'Productos', href: 'http://localhost:3001/products' },
-    { label: 'Mi Cuenta', href: 'http://localhost:3001/account' },
-    { label: 'Mis Pedidos', href: 'http://localhost:3001/orders' },
+    { label: 'Productos', href: `${storefrontUrl}/products` },
+    { label: 'Mi Cuenta', href: `${storefrontUrl}/account` },
+    { label: 'Mis Pedidos', href: `${storefrontUrl}/orders` },
   ],
 }
 </script>

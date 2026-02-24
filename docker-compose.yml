@@ -14,6 +14,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - limarpoo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-limarpoo_core}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   core:
     build:
@@ -23,17 +28,56 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-limarpoo_core}?schema=public
       - PORT=3000
+      - NODE_ENV=${NODE_ENV:-production}
+      - JWT_SECRET=${JWT_SECRET}
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
-    develop:
-      watch:
-        - action: sync
-          path: ./core/src
-          target: /app/src
-        - action: rebuild
-          path: ./core/package.json
+      postgres:
+        condition: service_healthy
+    networks:
+      - limarpoo-network
+
+  storefront:
+    build:
+      context: ./storefront
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    container_name: limarpoo-storefront
+    ports:
+      - "3001:3001"
+    depends_on:
+      - core
+    networks:
+      - limarpoo-network
+
+  landing:
+    build:
+      context: ./landing
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3000/api/v1}
+        - VITE_STOREFRONT_URL=${VITE_STOREFRONT_URL:-http://localhost:3001}
+    container_name: limarpoo-landing
+    ports:
+      - "3002:80"
+    depends_on:
+      - core
+    networks:
+      - limarpoo-network
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+      args:
+        - API_URL=${ADMIN_API_URL:-http://localhost:3000/api/v1}
+    container_name: limarpoo-admin
+    ports:
+      - "4200:80"
+    depends_on:
+      - core
     networks:
       - limarpoo-network
 

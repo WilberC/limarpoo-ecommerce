@@ -15,8 +15,12 @@ const port = process.env.PORT || 3000;
 const prisma = new PrismaClient();
 
 // Middleware
-app.use(cors());
-app.use(helmet());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(morgan("dev"));
 app.use(express.json());
 

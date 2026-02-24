@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:3001'
+
 const values = [
   { icon: '🎯', title: 'El Cliente Primero', desc: 'Cada decisión que tomamos parte de la pregunta: ¿cómo beneficia esto a nuestros clientes?' },
   { icon: '🤝', title: 'Confianza y Transparencia', desc: 'Creemos en la comunicación honesta — precios claros, sin cargos ocultos, políticas directas.' },
@@ -159,7 +161,7 @@ const timeline = [
       </p>
       <div class="flex flex-wrap justify-center gap-4">
         <RouterLink to="/contact" class="btn-primary bg-accent-500 hover:bg-accent-600 text-gray-900 font-bold">Contáctanos</RouterLink>
-        <a href="http://localhost:3001" class="btn-outline">Visita la Tienda</a>
+        <a :href="storefrontUrl" class="btn-outline">Visita la Tienda</a>
       </div>
     </div>
   </section>

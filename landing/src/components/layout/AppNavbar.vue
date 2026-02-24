@@ -6,6 +6,8 @@ const route = useRoute()
 const mobileOpen = ref(false)
 const scrolled = ref(false)
 
+const storefrontUrl = import.meta.env.VITE_STOREFRONT_URL ?? 'http://localhost:3001'
+
 const navLinks = [
   { to: '/', label: 'Inicio' },
   { to: '/about', label: 'Nosotros' },
@@ -57,7 +59,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
         <!-- CTA -->
         <div class="hidden md:flex items-center gap-3">
           <a
-            href="http://localhost:3001"
+            :href="storefrontUrl"
             class="btn-primary text-sm py-2 px-5"
           >Ir a la Tienda</a>
         </div>
@@ -98,7 +100,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
               @click="mobileOpen = false"
             >{{ link.label }}</RouterLink>
             <div class="pt-2 pb-1">
-              <a href="http://localhost:3001" class="btn-primary w-full text-sm justify-center">Ir a la Tienda</a>
+              <a :href="storefrontUrl" class="btn-primary w-full text-sm justify-center">Ir a la Tienda</a>
             </div>
           </div>
         </div>

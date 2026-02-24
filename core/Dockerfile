@@ -8,8 +8,6 @@ COPY tsconfig.json ./
 COPY src ./src
 COPY prisma ./prisma
 
-# Install dependencies including devDependencies for building
-# We need to install all dependencies to run the build script
 RUN npm install
 RUN npx prisma generate
 RUN npm run build
@@ -21,14 +19,16 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm install --only=production
+# Install all dependencies (including devDependencies for prisma CLI and ts-node used by seed)
+RUN npm install
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-# We need the prisma client in production too
+COPY docker-entrypoint.sh .
+
 RUN npx prisma generate
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
