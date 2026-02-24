@@ -13,9 +13,9 @@ const options: swaggerJSDoc.Options = {
     },
     servers: [
       {
-        url: process.env.API_BASE_URL || "http://localhost:3000",
-        description: process.env.NODE_ENV === "production" ? "Production Server" : "Development Server",
-      },
+        url: "https://core.wilberc.dev",
+        description: "Production Server",
+      }
     ],
   },
   apis: ["./src/routes/*.ts", "./src/server.ts"], // Path to the API docs
