@@ -1,15 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "lib": ["es2020"],
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2020"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    /* Eliminamos rootDir para permitir archivos de diferentes carpetas como prisma/ */
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true
   },
-  "include": ["src/**/*"],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "include": ["src/**/*", "prisma/seed.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

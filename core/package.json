@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
+    "start": "node --experimental-specifier-resolution=node dist/src/server.js",
+    "dev": "nodemon --loader ts-node/esm --experimental-specifier-resolution=node src/server.ts",
     "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
@@ -41,6 +41,6 @@
     "typescript": "^5.9.3"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node --loader ts-node/esm --experimental-specifier-resolution=node prisma/seed.ts"
   }
 }
