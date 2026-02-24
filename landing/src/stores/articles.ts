@@ -21,7 +21,7 @@ export const useArticlesStore = defineStore('articles', () => {
     }
   }
 
-  async function loadArticle(id: number) {
+  async function loadArticle(id: string) {
     loading.value = true
     error.value = null
     currentArticle.value = null

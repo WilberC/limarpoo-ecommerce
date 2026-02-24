@@ -6,7 +6,7 @@ import { useArticlesStore } from '@/stores/articles'
 const route = useRoute()
 const store = useArticlesStore()
 
-const articleId = computed(() => Number(route.params.id))
+const articleId = computed(() => route.params.id as string)
 
 onMounted(() => {
   store.loadArticle(articleId.value)
