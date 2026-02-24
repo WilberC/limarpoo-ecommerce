@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-limarpoo_core}
     ports:
-      - "5432:5432"
+      - "5443:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -31,7 +31,7 @@ services:
       - NODE_ENV=${NODE_ENV:-production}
       - JWT_SECRET=${JWT_SECRET}
     ports:
-      - "3000:3000"
+      - "5444:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000}
     container_name: limarpoo-storefront
     ports:
-      - "3001:3001"
+      - "5445:3001"
     depends_on:
       - core
     networks:
@@ -61,7 +61,7 @@ services:
         - VITE_STOREFRONT_URL=${VITE_STOREFRONT_URL:-http://localhost:3001}
     container_name: limarpoo-landing
     ports:
-      - "3002:80"
+      - "5446:80"
     depends_on:
       - core
     networks:
@@ -75,7 +75,7 @@ services:
         - API_URL=${ADMIN_API_URL:-http://localhost:3000/api/v1}
     container_name: limarpoo-admin
     ports:
-      - "4200:80"
+      - "5447:80"
     depends_on:
       - core
     networks:
